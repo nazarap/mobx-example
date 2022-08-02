@@ -36,12 +36,11 @@ export class AsyncSlice {
   }
 }
 
-const createValueSlice = Superclass => class ValueSlice extends Superclass {
+export class ValueSlice {
   value;
   initialValue;
 
   constructor (initialValue) {
-    super();
     this.value = initialValue;
     this.initialValue = initialValue;
 
@@ -64,13 +63,10 @@ const createValueSlice = Superclass => class ValueSlice extends Superclass {
 
   merge = (mergeValue) => {
     if (Array.isArray(this.value)){
-      this.value = [ ...this.value, ...mergeValue ];
+      this.value.push(...mergeValue);
     }
     if (typeof this.value === 'object'){
-      this.value = { ...this.value, ...mergeValue };
+      Object.assign(this.value, mergeValue);
     }
   }
 }
-
-export const ValueSlice = createValueSlice(Object);
-export const AsyncValueSlice = createValueSlice(AsyncSlice);
