@@ -6,6 +6,7 @@ const CounterValue = () => {
   const { counter } = useStore();
 
   const counterValue = counter.value;
+  const twiceValue = counter.twiceValue;
   const pending = counter.pending;
 
   console.count('Rerender Value');
@@ -13,7 +14,8 @@ const CounterValue = () => {
     <>
       {pending && <p>Loading...</p>}
       <p>
-        Counter: {counterValue}
+        Counter: {counterValue} <br/>
+        Multiply counter: {twiceValue}
       </p>
     </>
   );

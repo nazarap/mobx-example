@@ -1,7 +1,7 @@
-import counter from './counter';
+import Counter from './Counter';
 
 const services = {
-  counter
+  counter: new Counter(),
 };
 
 export default services;

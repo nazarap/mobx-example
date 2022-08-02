@@ -1,51 +1,76 @@
-import { makeAutoObservable } from 'mobx';
+import { makeObservable, observable, action } from 'mobx';
 
-export const makeSlice = structure => {
-  const slice = makeAutoObservable({
-    ...structure,
+export class AsyncSlice {
+  pending = false;
+  success =  false;
+  failure = false;
 
-    set (newValue) {
-      slice.value = newValue;
-    },
-    reset () {
-      slice.value = structure.value;
-    },
-    merge (mergeValue) {
-      if (Array.isArray(slice.value)){
-        slice.value = [ ...slice.value, ...mergeValue ];
-      }
-      if (typeof slice.value === 'object'){
-        slice.value = { ...slice.value, ...mergeValue };
-      }
+  constructor() {
+    makeObservable(this, {
+      pending: observable,
+      success: observable,
+      failure: observable,
+
+      doPending: action,
+      doSuccess: action,
+      doFailure: action,
+    })
+  }
+
+  doPending () {
+    this.pending = true;
+    this.failure = false;
+    this.success = false;
+  }
+
+  doSuccess () {
+    this.pending = false;
+    this.failure = false;
+    this.success = true;
+  }
+
+  doFailure () {
+    this.pending = false;
+    this.failure = true;
+    this.success = false;
+  }
+}
+
+const createValueSlice = Superclass => class ValueSlice extends Superclass {
+  value;
+  initialValue;
+
+  constructor (initialValue) {
+    super();
+    this.value = initialValue;
+    this.initialValue = initialValue;
+
+    makeObservable(this, {
+      value: observable,
+
+      set: action,
+      reset: action,
+      merge: action,
+    })
+  }
+
+  set = newValue => {
+    this.value = newValue;
+  }
+
+  reset = () => {
+    this.value = this.initialValue;
+  }
+
+  merge = (mergeValue) => {
+    if (Array.isArray(this.value)){
+      this.value = [ ...this.value, ...mergeValue ];
     }
-  });
+    if (typeof this.value === 'object'){
+      this.value = { ...this.value, ...mergeValue };
+    }
+  }
+}
 
-  return slice;
-};
-
-export const makeAsyncSlice = structure => {
-  const slice = makeSlice({
-    ...structure,
-
-    pending: false,
-    success: false,
-    failure: false,
-    doPending () {
-      slice.pending = true;
-      slice.failure = false;
-      slice.success = false;
-    },
-    doSuccess () {
-      slice.pending = false;
-      slice.failure = false;
-      slice.success = true;
-    },
-    doFailure () {
-      slice.pending = false;
-      slice.failure = true;
-      slice.success = false;
-    },
-  });
-
-  return slice;
-};
+export const ValueSlice = createValueSlice(Object);
+export const AsyncValueSlice = createValueSlice(AsyncSlice);
